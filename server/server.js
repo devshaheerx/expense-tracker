@@ -1,11 +1,12 @@
 import express from 'express';
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import cors from 'cors';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
-import connectDB from './config/db.js'; // note the required .js extension here
+import connectDB from './config/db.js';
+import authRoutes from './routes/authRoutes.js';
+import './passport/passportConfig.js';
 
-dotenv.config();
 connectDB();
 
 const app = express();
@@ -19,6 +20,8 @@ app.use(
     credentials: true,
   })
 );
+
+app.use('/api/auth', authRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
