@@ -115,3 +115,17 @@ export const oauthCallback = async (req, res) => {
     res.redirect(`${process.env.CLIENT_URL}/login?error=oauth_failed`);
   }
 };
+
+// GET /api/auth/me — protected by the `protect` middleware, so req.user is
+// already guaranteed to exist and be verified by the time this code runs.
+export const getMe = async (req, res) => {
+  res.status(200).json({
+    user: {
+      id: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+      avatar: req.user.avatar,
+      authProvider: req.user.authProvider,
+    },
+  });
+};

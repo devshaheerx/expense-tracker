@@ -6,6 +6,9 @@ import cookieParser from 'cookie-parser';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import './passport/passportConfig.js';
+import transactionRoutes from './routes/transactionRoutes.js';
+import budgetRoutes from './routes/budgetRoutes.js';
+import summaryRoutes from './routes/summaryRoutes.js';
 
 connectDB();
 
@@ -22,6 +25,9 @@ app.use(
 );
 
 app.use('/api/auth', authRoutes);
+app.use('/api/transactions', transactionRoutes);
+app.use('/api/budgets', budgetRoutes);
+app.use('/api/summary', summaryRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
