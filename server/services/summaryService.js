@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import Transaction from '../models/Transaction.js';
+import Budget from '../models/Budget.js';
 
 // Spending by category — e.g. "Food: $450, Transport: $120" for a given month/year.
 // This is the exact shape Recharts' pie/bar chart components expect.
@@ -120,4 +121,80 @@ export const getOverview = async (userId, { month, year }) => {
   const expense = totals.find((t) => t._id === 'expense')?.total || 0;
 
   return { income, expense, balance: income - expense };
+};
+
+// Spend for ONE specific category across the last N months — e.g. "Food: Jan 120,
+// Feb 95, Mar 340" — powers the category-focused trend chart on the Transactions
+// and Budgets pages, as opposed to getMonthlyTrend's all-category income/expense split.
+export const getCategoryTrend = async (userId, { category, months = 6 }) => {
+  if (!category) {
+    throw new Error('Category is required');
+  }
+
+  const now = new Date();
+  const startDate = new Date(now.getFullYear(), now.getMonth() - (Number(months) - 1), 1);
+
+  const results = await Transaction.aggregate([
+    {
+      $match: {
+        user: new mongoose.Types.ObjectId(userId),
+        category,
+        date: { $gte: startDate },
+      },
+    },
+    {
+      $group: {
+        _id: { year: { $year: '$date' }, month: { $month: '$date' } },
+        total: { $sum: '$amount' },
+      },
+    },
+    { $sort: { '_id.year': 1, '_id.month': 1 } },
+  ]);
+
+  // Build a complete N-month scaffold (so months with zero spend still show as 0,
+  // not just missing from the chart) then fill in whatever the aggregation found.
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const scaffold = [];
+  for (let i = Number(months) - 1; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    scaffold.push({ year: d.getFullYear(), month: d.getMonth() + 1, label: monthNames[d.getMonth()], total: 0 });
+  }
+
+  results.forEach((r) => {
+    const match = scaffold.find((s) => s.year === r._id.year && s.month === r._id.month);
+    if (match) match.total = r.total;
+  });
+
+  return scaffold.map((s) => ({ month: s.label, total: s.total }));
+};
+
+// One row per budgeted category, comparing this month's actual spend against
+// that category's limit — powers an all-at-once "budget vs actual" bar chart,
+// as opposed to getCategoryTrend which only looks at one category over time.
+export const getBudgetVsActual = async (userId) => {
+  const budgets = await Budget.find({ user: userId, period: 'monthly' });
+
+  if (budgets.length === 0) return [];
+
+  const startOfMonth = new Date();
+  startOfMonth.setDate(1);
+  startOfMonth.setHours(0, 0, 0, 0);
+
+  const spendResults = await Transaction.aggregate([
+    {
+      $match: {
+        user: new mongoose.Types.ObjectId(userId),
+        type: 'expense',
+        user: new mongoose.Types.ObjectId(userId),
+        date: { $gte: startOfMonth },
+      },
+    },
+    { $group: { _id: '$category', total: { $sum: '$amount' } } },
+  ]);
+
+  return budgets.map((b) => ({
+    category: b.category,
+    limit: b.limit,
+    spent: spendResults.find((s) => s._id === b.category)?.total || 0,
+  }));
 };

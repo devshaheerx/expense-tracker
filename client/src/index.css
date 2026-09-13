@@ -1,1 +1,214 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  color-scheme: light;
+
+  --color-bg: 244 246 250;
+  --color-ink: 30 41 59;
+  --color-solid: 255 255 255; /* opaque surface — toasts, dropdown popups */
+  --color-border: 226 232 240;
+  --color-accent: 79 70 229; /* indigo — clean, high-contrast, modern fintech */
+  --color-income: 22 163 74;
+  --color-expense: 220 38 38;
+
+  --card-bg: rgb(var(--color-solid));
+  --card-border-w: 1px;
+  --card-border-color: rgb(var(--color-border));
+  --card-radius: 16px;
+  --card-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.05), 0 6px 16px rgba(15, 23, 42, 0.06);
+  --card-blur: none;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --color-bg: 10 13 24;
+  --color-ink: 226 232 240;
+  --color-solid: 23 30 51; /* opaque dark navy — fixes the white-on-white bug */
+  --color-border: 255 255 255;
+  --color-accent: 212 160 23;
+  --color-income: 111 163 122;
+  --color-expense: 217 130 106;
+
+  --card-bg: rgba(255, 255, 255, 0.06);
+  --card-border-w: 1px;
+  --card-border-color: rgba(255, 255, 255, 0.14);
+  --card-radius: 18px;
+  --card-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.35), 0 0 40px rgba(212, 160, 23, 0.07);
+  --card-blur: blur(20px);
+}
+
+* {
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+body {
+  background-color: rgb(var(--color-bg));
+  color: rgb(var(--color-ink));
+  font-family: "Inter", sans-serif;
+  min-height: 100vh;
+}
+
+.dark body {
+  background:
+    radial-gradient(
+      circle at 15% 20%,
+      rgba(212, 160, 23, 0.1),
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 85% 75%,
+      rgba(111, 163, 122, 0.1),
+      transparent 40%
+    ),
+    rgb(var(--color-bg));
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: "Fraunces", serif;
+}
+.font-mono-amount {
+  font-family: "JetBrains Mono", monospace;
+}
+
+/* Simple, reusable entrance animation for cards/sections mounting in */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-rise {
+  animation: rise-in 0.35s ease-out both;
+}
+
+@layer components {
+  .ledger-card {
+    background: var(--card-bg);
+    border: var(--card-border-w) solid var(--card-border-color);
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+    backdrop-filter: var(--card-blur);
+    -webkit-backdrop-filter: var(--card-blur);
+  }
+
+  /* Buttons always fully rounded, independent of the card radius token —
+     this is a deliberate, fixed shape choice, not theme-dependent. */
+  .btn-primary {
+    background-color: rgb(var(--color-accent));
+    color: white;
+    border: none;
+    border-radius: 9999px;
+    font-weight: 600;
+    padding: 0.6rem 1.25rem;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease,
+      opacity 0.15s ease;
+  }
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgb(var(--color-accent) / 0.35);
+  }
+  .btn-primary:active {
+    transform: translateY(0px) scale(0.98);
+  }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    transform: none;
+  }
+
+  .btn-outline {
+    background-color: transparent;
+    color: rgb(var(--color-ink));
+    border: 1.5px solid var(--card-border-color);
+    border-radius: 9999px;
+    font-weight: 500;
+    padding: 0.55rem 1.1rem;
+    transition:
+      transform 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .btn-outline:hover {
+    background-color: rgb(var(--color-ink) / 0.06);
+    transform: translateY(-1px);
+  }
+  .btn-outline:active {
+    transform: translateY(0px) scale(0.98);
+  }
+
+  .input-field {
+    width: 100%;
+    background-color: rgb(var(--color-solid));
+    border: 1.5px solid var(--card-border-color);
+    border-radius: 12px;
+    color: rgb(var(--color-ink));
+    padding: 0.55rem 0.85rem;
+  }
+  .input-field:focus {
+    outline: 2px solid rgb(var(--color-accent));
+    outline-offset: 1px;
+  }
+  .stat-card {
+    border-radius: 20px;
+  }
+  /* Promotes the sidebar to its own compositor layer during the width transition,
+   preventing the backdrop-blur from visibly repainting the page behind it
+   for a frame or two mid-animation. */
+  aside.ledger-card {
+    will-change: width;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+  /* Dropdown popup list — explicitly opaque so options are always readable
+     regardless of theme (this is the fix for the invisible-dropdown bug). */
+  select.input-field option {
+    background-color: rgb(var(--color-solid));
+    color: rgb(var(--color-ink));
+  }
+
+  .ledger-divider {
+    border-bottom: 1px solid rgb(var(--color-border) / 0.5);
+  }
+  .dark .ledger-divider {
+    border-bottom: 1px dashed rgb(var(--color-border) / 0.16);
+  }
+
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: 12px;
+    font-weight: 500;
+    color: rgb(var(--color-ink) / 0.65);
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease,
+      transform 0.15s ease;
+  }
+  .sidebar-link:hover {
+    background-color: rgb(var(--color-ink) / 0.06);
+    color: rgb(var(--color-ink));
+    transform: translateX(2px);
+  }
+  .sidebar-link.active {
+    background-color: rgb(var(--color-accent) / 0.14);
+    color: rgb(var(--color-accent));
+  }
+}

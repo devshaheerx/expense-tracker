@@ -1,3 +1,4 @@
+// utils/generateTokens.js
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 
@@ -23,6 +24,9 @@ export const setAuthCookies = (res, accessToken, refreshToken) => {
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
     secure: isProduction,
+    // 'none' is required in production because your frontend and backend sit
+    // on two different Vercel domains (cross-site). 'lax' is fine for local
+    // dev since both run on localhost.
     sameSite: isProduction ? "none" : "lax",
     maxAge: 15 * 60 * 1000,
   });

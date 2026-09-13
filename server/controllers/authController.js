@@ -1,4 +1,4 @@
-import { issueTokensForUser } from '../services/authService.js';
+import { issueTokensForUser } from "../services/authService.js";
 import {
   signupUser,
   verifyUserOtp,
@@ -9,6 +9,10 @@ import {
   logoutAllUser,
 } from "../services/authService.js";
 import { setAuthCookies } from "../utils/generateTokens.js";
+import {
+  requestPasswordReset,
+  resetPassword,
+} from "../services/authService.js";
 
 const handleError = (res, error) => {
   console.error(error.message);
@@ -23,13 +27,10 @@ const handleError = (res, error) => {
 export const signup = async (req, res) => {
   try {
     const result = await signupUser(req.body);
-    res
-      .status(201)
-      .json({
-        message:
-          "Signup successful. Check your email for the verification code.",
-        ...result,
-      });
+    res.status(201).json({
+      message: "Signup successful. Check your email for the verification code.",
+      ...result,
+    });
   } catch (error) {
     handleError(res, error);
   }
@@ -98,7 +99,6 @@ export const logoutAll = async (req, res) => {
   }
 };
 
-
 // GET /api/auth/google/callback and /api/auth/github/callback both use this.
 // By the time this runs, Passport has already done the OAuth handshake and
 // attached the found/created user to req.user.
@@ -111,7 +111,7 @@ export const oauthCallback = async (req, res) => {
     // This is the moment control returns to your frontend after the OAuth detour.
     res.redirect(`${process.env.CLIENT_URL}/dashboard`);
   } catch (error) {
-    console.error('OAuth callback error:', error.message);
+    console.error("OAuth callback error:", error.message);
     res.redirect(`${process.env.CLIENT_URL}/login?error=oauth_failed`);
   }
 };
@@ -128,4 +128,34 @@ export const getMe = async (req, res) => {
       authProvider: req.user.authProvider,
     },
   });
+};
+
+export const forgotPassword = async (req, res) => {
+  try {
+    await requestPasswordReset(req.body);
+    // Same generic message regardless of whether the account existed — see the
+    // service function's comment for why.
+    res
+      .status(200)
+      .json({
+        message:
+          "If an account exists with this email, a reset code has been sent.",
+      });
+  } catch (error) {
+    handleError(res, error);
+  }
+};
+
+export const resetUserPassword = async (req, res) => {
+  try {
+    await resetPassword(req.body);
+    res
+      .status(200)
+      .json({
+        message:
+          "Password reset successfully. Please log in with your new password.",
+      });
+  } catch (error) {
+    handleError(res, error);
+  }
 };

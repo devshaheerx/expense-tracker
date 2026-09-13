@@ -13,6 +13,8 @@ import {
 } from '../controllers/authController.js';
 import { otpRequestLimiter, otpVerifyLimiter } from '../middleware/rateLimiter.js';
 import { protect } from '../middleware/authMiddleware.js';
+import { forgotPassword, resetUserPassword } from '../controllers/authController.js';
+
 
 const router = express.Router();
 
@@ -23,6 +25,8 @@ router.post('/login', login);
 router.post('/refresh-token', refreshAccessToken);
 router.post('/logout', logout);
 router.post('/logout-all', logoutAll);
+router.post('/forgot-password', otpRequestLimiter, forgotPassword);
+router.post('/reset-password', otpVerifyLimiter, resetUserPassword);
 
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
 router.get(

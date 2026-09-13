@@ -283,4 +283,64 @@ export const findOrCreateOAuthUser = async ({ provider, providerId, email, name,
   return user;
 };
 
+// Add these two functions to authService.js
+
+export const requestPasswordReset = async ({ email }) => {
+  if (!email) {
+    throw new AppError('Email is required', 400);
+  }
+
+  const user = await User.findOne({ email: email.toLowerCase() });
+
+  // Deliberately vague response whether or not the account exists — prevents
+  // someone from using this endpoint to check which emails are registered
+  // (a real security concern for password-reset flows specifically).
+  if (!user) {
+    return;
+  }
+
+  if (!user.password) {
+    // OAuth-only account — there's no password to reset. We still don't reveal
+    // this distinction to an unauthenticated caller, for the same reason as above.
+    return;
+  }
+
+  const otp = generateOTP();
+  user.otp = await bcrypt.hash(otp, 10);
+  user.otpExpiry = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000);
+  await user.save();
+
+  await sendOTPEmail(user.email, otp, 'reset');
+};
+
+export const resetPassword = async ({ email, otp, newPassword }) => {
+  if (!email || !otp || !newPassword) {
+    throw new AppError('Email, OTP, and new password are required', 400);
+  }
+
+  const user = await User.findOne({ email: email.toLowerCase() }).select('+otp +otpExpiry');
+
+  if (!user || !user.otp || !user.otpExpiry) {
+    throw new AppError('No password reset was requested for this email', 400);
+  }
+
+  if (user.otpExpiry < new Date()) {
+    throw new AppError('Code has expired. Please request a new one.', 400);
+  }
+
+  const isMatch = await bcrypt.compare(otp, user.otp);
+  if (!isMatch) {
+    throw new AppError('Invalid code', 400);
+  }
+
+  user.password = await bcrypt.hash(newPassword, 12);
+  user.otp = undefined;
+  user.otpExpiry = undefined;
+  await user.save();
+
+  // Security best practice: invalidate every existing session on password reset.
+  // If someone else had unauthorized access, this locks them out immediately.
+  await RefreshToken.deleteMany({ user: user._id });
+};
+
 export { AppError };
