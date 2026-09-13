@@ -30,21 +30,20 @@ const Overview = () => {
 
   return (
     <div className="animate-rise">
-      <h1 className="font-display text-2xl font-semibold text-[rgb(var(--color-ink))] mb-1">
+      <h1 className="font-display text-xl sm:text-2xl font-semibold text-[rgb(var(--color-ink))] mb-1">
         Welcome, {user?.name}
       </h1>
       <p className="text-sm opacity-60 mb-5 text-[rgb(var(--color-ink))]">
-        A snapshot of your money this month — what's coming in, what's going
-        out, and where it's going.
+        Here's where things stand this month.
       </p>
 
       <OverviewCards overview={overview} />
 
-      <div className="grid md:grid-cols-2 gap-6 mt-6">
-        <div className="ledger-card p-6">
-          <div className="flex items-center justify-between mb-1">
-            <h2 className="font-display text-lg font-semibold text-[rgb(var(--color-ink))]">
-              Where it's split by category
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        <div className="ledger-card p-4 sm:p-6 min-w-0">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <h2 className="font-display text-base sm:text-lg font-semibold text-[rgb(var(--color-ink))]">
+              Spending by category
             </h2>
             <select
               value={breakdownType}
@@ -55,17 +54,13 @@ const Overview = () => {
               <option value="income">Income</option>
             </select>
           </div>
-          <p className="text-xs opacity-60 mb-4 text-[rgb(var(--color-ink))]">
-            Every {breakdownType} this month, added up per category, so you can
-            see at a glance what takes the biggest share.
-          </p>
           <CategoryPieChart data={breakdown} />
         </div>
 
-        <div className="ledger-card p-6">
-          <div className="flex items-center justify-between mb-1">
-            <h2 className="font-display text-lg font-semibold text-[rgb(var(--color-ink))]">
-              Income vs expense, month by month
+        <div className="ledger-card p-4 sm:p-6 min-w-0">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+            <h2 className="font-display text-base sm:text-lg font-semibold text-[rgb(var(--color-ink))]">
+              Income vs expense
             </h2>
             <select
               value={trendYear}
@@ -79,10 +74,6 @@ const Overview = () => {
               ))}
             </select>
           </div>
-          <p className="text-xs opacity-60 mb-4 text-[rgb(var(--color-ink))]">
-            Both totals for each month of {trendYear}, side by side, so you can
-            spot which months you saved and which ran hot.
-          </p>
           <TrendLineChart data={trend} />
         </div>
       </div>

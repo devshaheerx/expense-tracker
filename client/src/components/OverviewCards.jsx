@@ -7,7 +7,9 @@ const StatCard = ({ label, value, colorClass }) => {
   return (
     <div className="ledger-card stat-card p-4 text-center">
       <p className="text-sm opacity-70 text-[rgb(var(--color-ink))]">{label}</p>
-      <p className={`text-xl font-bold font-mono-amount ${colorClass}`}>
+      <p
+        className={`text-lg sm:text-xl font-bold font-mono-amount break-words ${colorClass}`}
+      >
         {animatedValue.toFixed(2)}
       </p>
     </div>
@@ -16,7 +18,7 @@ const StatCard = ({ label, value, colorClass }) => {
 
 const OverviewCards = ({ overview }) => {
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
       <StatCard
         label="Income"
         value={overview.income}

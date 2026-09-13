@@ -78,18 +78,14 @@ const TransactionsPage = () => {
 
   return (
     <div className="animate-rise">
-      <h1 className="font-display text-2xl font-semibold text-[rgb(var(--color-ink))] mb-1">
+      <h1 className="font-display text-xl sm:text-2xl font-semibold text-[rgb(var(--color-ink))] mb-5">
         Transactions
       </h1>
-      <p className="text-sm opacity-60 mb-5 text-[rgb(var(--color-ink))]">
-        Log what comes in and goes out, and see how any single category has
-        moved over recent months.
-      </p>
 
-      <div className="ledger-card p-6 mb-6">
-        <div className="flex items-center justify-between mb-1">
-          <h2 className="font-display text-lg font-semibold text-[rgb(var(--color-ink))]">
-            One category, over time
+      <div className="ledger-card p-4 sm:p-6 mb-6 min-w-0">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <h2 className="font-display text-base sm:text-lg font-semibold text-[rgb(var(--color-ink))]">
+            Category over time
           </h2>
           <select
             value={chartCategory}
@@ -103,15 +99,11 @@ const TransactionsPage = () => {
             ))}
           </select>
         </div>
-        <p className="text-xs opacity-60 mb-4 text-[rgb(var(--color-ink))]">
-          The last 6 months of {chartCategory}, totaled month by month — useful
-          for spotting whether this category is creeping up or settling down.
-        </p>
         <CategoryBarChart data={categoryTrend} color="#dc2626" />
       </div>
 
-      <div className="grid md:grid-cols-[320px_1fr] gap-6 items-start">
-        <div className="ledger-card p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(280px,320px)_1fr] gap-6 items-start">
+        <div className="ledger-card p-4 sm:p-6">
           <h3 className="font-semibold mb-3 text-[rgb(var(--color-ink))]">
             Add transaction
           </h3>
@@ -168,7 +160,7 @@ const TransactionsPage = () => {
           </form>
         </div>
 
-        <div className="ledger-card p-6">
+        <div className="ledger-card p-4 sm:p-6 min-w-0">
           <h3 className="font-semibold mb-3 text-[rgb(var(--color-ink))]">
             Recent
           </h3>
@@ -181,7 +173,7 @@ const TransactionsPage = () => {
             {transactions.map((t) => (
               <li
                 key={t._id}
-                className="ledger-divider flex items-center gap-3 py-3"
+                className="ledger-divider flex flex-wrap sm:flex-nowrap items-center gap-3 py-3"
               >
                 <div
                   className="w-9 h-9 shrink-0 rounded-full flex items-center justify-center"
@@ -202,7 +194,7 @@ const TransactionsPage = () => {
                     <ArrowDownRight size={16} />
                   )}
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-[120px]">
                   <p className="text-sm font-medium text-[rgb(var(--color-ink))] truncate">
                     {t.category}
                   </p>
@@ -213,11 +205,7 @@ const TransactionsPage = () => {
                   )}
                 </div>
                 <span
-                  className={`font-mono-amount text-sm ${
-                    t.type === "income"
-                      ? "text-[rgb(var(--color-income))]"
-                      : "text-[rgb(var(--color-expense))]"
-                  }`}
+                  className={`font-mono-amount text-sm ${t.type === "income" ? "text-[rgb(var(--color-income))]" : "text-[rgb(var(--color-expense))]"}`}
                 >
                   {t.type === "income" ? "+" : "-"}
                   {t.amount.toFixed(2)}

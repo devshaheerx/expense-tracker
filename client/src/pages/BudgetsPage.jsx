@@ -45,27 +45,19 @@ const BudgetsPage = () => {
 
   return (
     <div className="animate-rise">
-      <h1 className="font-display text-2xl font-semibold text-[rgb(var(--color-ink))] mb-1">
+      <h1 className="font-display text-xl sm:text-2xl font-semibold text-[rgb(var(--color-ink))] mb-5">
         Budgets
       </h1>
-      <p className="text-sm opacity-60 mb-5 text-[rgb(var(--color-ink))]">
-        Set a monthly limit per category, and see exactly how this month's
-        spending measures up against it.
-      </p>
 
-      <div className="ledger-card p-6 mb-6">
-        <h2 className="font-display text-lg font-semibold text-[rgb(var(--color-ink))] mb-1">
-          Limit vs actual, every category
+      <div className="ledger-card p-4 sm:p-6 mb-6 min-w-0">
+        <h2 className="font-display text-base sm:text-lg font-semibold text-[rgb(var(--color-ink))] mb-4">
+          Spend vs limit — all categories
         </h2>
-        <p className="text-xs opacity-60 mb-4 text-[rgb(var(--color-ink))]">
-          Each budget's limit next to what you've actually spent so far this
-          month — a shorter red bar than blue means you're under budget.
-        </p>
         <BudgetComparisonChart data={budgetVsActual} />
       </div>
 
-      <div className="grid md:grid-cols-[320px_1fr] gap-6 items-start">
-        <div className="ledger-card p-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(280px,320px)_1fr] gap-6 items-start">
+        <div className="ledger-card p-4 sm:p-6">
           <h3 className="font-semibold mb-3 text-[rgb(var(--color-ink))]">
             Create budget
           </h3>
@@ -96,7 +88,7 @@ const BudgetsPage = () => {
           </form>
         </div>
 
-        <div className="ledger-card p-6">
+        <div className="ledger-card p-4 sm:p-6">
           <h3 className="font-semibold mb-3 text-[rgb(var(--color-ink))]">
             Your budgets
           </h3>
@@ -109,7 +101,7 @@ const BudgetsPage = () => {
             {budgets.map((b) => (
               <li
                 key={b._id}
-                className="ledger-divider flex items-center justify-between py-3"
+                className="ledger-divider flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 py-3"
               >
                 <span className="text-sm font-medium text-[rgb(var(--color-ink))]">
                   {b.category}
