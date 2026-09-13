@@ -17,8 +17,8 @@ import BudgetsPage from "./pages/BudgetsPage";
 import PageNotFound from "./pages/PageNotFound";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import DashboardLayout from "./components/DashboardLayout";
-import SettingsPage from './pages/SettingsPage';
-
+import SettingsPage from "./pages/SettingsPage";
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   const dispatch = useDispatch();
@@ -39,6 +39,7 @@ function App() {
 
   return (
     <>
+      <ScrollToTop />
       <Toaster
         position="top-center"
         toastOptions={{

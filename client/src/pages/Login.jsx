@@ -86,10 +86,7 @@ const Login = () => {
         </button>
       </form>
 
-      <div className="my-5 flex items-center gap-3 text-xs opacity-60">
-        <div className="ledger-divider flex-1" /> or{" "}
-        <div className="ledger-divider flex-1" />
-      </div>
+      <div className="auth-divider">or continue with</div>
 
       <div className="space-y-2">
         <button
